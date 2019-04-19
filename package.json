@@ -5,14 +5,19 @@
   "license": "MIT",
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
+    "@types/expect-puppeteer": "^3.3.1",
     "@types/ioredis": "^4.0.10",
     "@types/jest": "^24.0.11",
+    "@types/jest-environment-puppeteer": "^4.0.0",
     "@types/node": "^8.0.29",
+    "@types/puppeteer": "^1.12.3",
     "@types/uuid": "^3.4.4",
     "@types/yup": "^0.26.12",
     "gql2ts": "^1.10.1",
     "jest": "^24.7.1",
+    "jest-puppeteer": "^4.1.1",
     "nodemon": "^1.18.11",
+    "puppeteer": "^1.14.0",
     "supertest": "^4.0.2",
     "ts-jest": "^24.0.2",
     "ts-node": "3.3.0",
@@ -39,6 +44,7 @@
     "test": "NODE_ENV=test jest --forceExit --detectOpenHandles"
   },
   "jest": {
+    "globalSetup": "./src/setup_test/callSetup.js",
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
