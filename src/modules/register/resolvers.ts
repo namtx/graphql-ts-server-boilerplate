@@ -4,6 +4,7 @@ import { ResolverMap } from "../../types/graphql_utils"
 import { User } from "../../entity/User"
 import { formatYupError } from "../../utils/formatYupError";
 import { createConfirmEmailLink } from "../../utils/createConfirmEmailLink";
+import { sendConfirmEmail } from "../../utils/sendConfirmEmail";
 
 const schema = yup.object().shape({
   email: yup.string().email().min(3).max(255),
@@ -39,7 +40,8 @@ export const resolvers: ResolverMap = {
       });
       await user.save()
 
-      await createConfirmEmailLink(url, user.id, redis)
+      const confirmLink = await createConfirmEmailLink(url, user.id, redis)
+      await sendConfirmEmail(user.email, confirmLink)
       return null
     }
   },

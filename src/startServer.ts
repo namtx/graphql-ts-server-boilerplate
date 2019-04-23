@@ -1,38 +1,37 @@
 import { GraphQLServer } from "graphql-yoga"
-import { importSchema } from "graphql-import"
-import * as path from "path"
-import * as fs from "fs"
-import * as Redis from "ioredis"
+import * as session from "express-session"
+import * as cookieParser from "cookie-parser"
+import * as connectRedis from "connect-redis"
+import { createTypeOrmConnection } from "./utils/createTypeOrmConnection"
+import { redis } from "./redis"
+import { confirmEmail } from "./routes/confirmEmail"
+import { generateSchema } from "./utils/generateSchema"
 
-import { createTypeOrmConnection } from "./utils/createTypeOrmConnection";
-import { GraphQLSchema } from "graphql";
-import { makeExecutableSchema, mergeSchemas } from "graphql-tools";
-import { User } from "./entity/User";
+const SESSION_SECRET = "graphql-ts-server-boilerplate"
 
 export const startServer = async () => {
-  const schemas: GraphQLSchema[] = []
-  const folders = fs.readdirSync(path.join(__dirname, "./modules"))
-  folders.forEach(folder => {
-    const { resolvers } = require(`./modules/${folder}/resolvers.ts`)
-    const typeDefs = importSchema(
-      path.join(__dirname, `./modules/${folder}/schema.graphql`)
-    )
-    schemas.push(makeExecutableSchema({ resolvers, typeDefs }))
-  })
-
-  const redis = new Redis()
-
   const server = new GraphQLServer({
-    schema: mergeSchemas({ schemas }), context: ({ request }) => (
-      { redis, url: `${request.protocol}://${request.get("host")}` }
+    schema: generateSchema(), context: ({ request }) => (
+      { redis, url: `${request.protocol}://${request.get("host")}`, session: request.session }
     )
   })
 
-  server.express.get("/confirm/:id", async (req, res) => {
-    const userId = await redis.get(req.params.id)
-    await User.update({ id: userId }, { confirmed: true })
-    res.send("OK")
-  })
+  const RedisStore = connectRedis(session)
+
+  server.express.use(cookieParser())
+  server.express.use(session({
+    store: new RedisStore({ client: redis as any }),
+    name: "graphql-ts-server-boilerplate",
+    secret: SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
+    }
+  }))
+  server.express.get("/confirm/:id", confirmEmail)
 
   await createTypeOrmConnection()
   const app = await server.start({ port: process.env.NODE_ENV === "test" ? 0 : 4000 })

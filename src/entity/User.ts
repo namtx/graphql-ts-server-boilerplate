@@ -2,8 +2,11 @@ import {
   Entity,
   Column,
   BaseEntity,
-  PrimaryGeneratedColumn
+  PrimaryGeneratedColumn,
+  BeforeInsert
 } from "typeorm";
+
+import * as uuidv4 from "uuid/v4"
 
 @Entity("users")
 export class User extends BaseEntity {
@@ -18,4 +21,9 @@ export class User extends BaseEntity {
 
   @Column("boolean", { default: false })
   confirmed: boolean
+
+  @BeforeInsert()
+  addId() {
+    this.id = uuidv4()
+  }
 }

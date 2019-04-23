@@ -5,11 +5,16 @@
   "license": "MIT",
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
+    "@types/connect-redis": "^0.0.9",
+    "@types/dotenv": "^6.1.1",
     "@types/expect-puppeteer": "^3.3.1",
+    "@types/express-session": "^1.15.12",
     "@types/ioredis": "^4.0.10",
     "@types/jest": "^24.0.11",
     "@types/jest-environment-puppeteer": "^4.0.0",
     "@types/node": "^8.0.29",
+    "@types/node-fetch": "^2.3.2",
+    "@types/nodemailer": "^4.6.7",
     "@types/puppeteer": "^1.12.3",
     "@types/uuid": "^3.4.4",
     "@types/yup": "^0.26.12",
@@ -23,14 +28,22 @@
     "ts-node": "3.3.0",
     "tslint": "^5.16.0",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "2.5.2"
+    "typescript": "^3.4.4"
   },
   "dependencies": {
+    "@gql2ts/from-schema": "^1.10.1",
+    "@types/cookie-parser": "^1.4.1",
     "bcryptjs": "^2.4.3",
+    "connect-redis": "^3.4.1",
+    "cookie-parser": "^1.4.4",
+    "dotenv": "^7.0.0",
+    "express-session": "^1.16.1",
     "graphql-import": "^0.7.1",
     "graphql-request": "^1.8.2",
     "graphql-yoga": "^1.17.4",
     "ioredis": "^4.9.0",
+    "node-fetch": "^2.3.0",
+    "nodemailer": "^6.1.1",
     "pg": "^7.3.0",
     "reflect-metadata": "^0.1.10",
     "typeorm": "0.2.16",
@@ -39,9 +52,9 @@
   },
   "scripts": {
     "start": "NODE_ENV=development nodemon --exec ts-node src/index.ts",
-    "gen-schema-types": "gql2ts src/schema.graphql -o src/types/schema.d.ts",
+    "gen-schema-types": "ts-node --files src/scripts/createTypes.ts",
     "test-server": "NODE_ENV=test ts-node src/index.ts",
-    "test": "NODE_ENV=test jest --forceExit --detectOpenHandles"
+    "test": "NODE_ENV=test jest --forceExit --detectOpenHandles --watch"
   },
   "jest": {
     "globalSetup": "./src/setup_test/callSetup.js",

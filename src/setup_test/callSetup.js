@@ -2,6 +2,8 @@ require("ts-node/register");
 const { setup } = require("./setup.ts");
 
 module.exports = async function() {
-  await setup();
+  if (!process.env.TESTING_HOST) {
+    await setup();
+  }
   return null;
 };
